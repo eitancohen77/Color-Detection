@@ -6,6 +6,10 @@ canvas.height = 450;
 const image1 = new Image();
 image1.src = "/public/photo.avif"
 
+// What we do here is we create a canvas and we frame the image onto that canvas
+// Reason why is because we can then use the getImageData function which allows 
+// us to map the image onto a 2D picture where we can manipulate pixels.
+// Here we use it to get the RGB of any pixel in the image(canvas).
 image1.addEventListener('load', function() {
     ctx.drawImage(image1, 0, 0)
 })
