@@ -4,7 +4,10 @@ canvas.width = 800;
 canvas.height = 450;
 
 const image1 = new Image();
-image1.src = "/public/photo.avif"
+const color_name = document.getElementById('colorName')
+image1.src = '/static/photo.avif'
+
+
 
 // What we do here is we create a canvas and we frame the image onto that canvas
 // Reason why is because we can then use the getImageData function which allows 
@@ -24,5 +27,20 @@ canvas.addEventListener('click', function(event) {
     const green = pixelData[1];
     const blue = pixelData[2];
 
-    console.log(`RGB(${red}, ${green}, ${blue})`);
+    const rgb = (`rgb(${red}, ${green}, ${blue})`);
+
+
+    fetch('/handle_rgb', {
+        method: 'POST',
+        body: JSON.stringify({'rgb': rgb}),
+        headers: {'Content-Type': 'application/json'}
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Data received from server:', data);
+        color_name.textContent = data['color']
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
 });
