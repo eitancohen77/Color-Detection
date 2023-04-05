@@ -5,7 +5,7 @@ canvas.height = 450;
 
 const image1 = new Image();
 const color_name = document.getElementById('colorName')
-image1.src = '/static/photo.avif'
+image1.src = '/photo.avif'
 
 
 
@@ -29,18 +29,33 @@ canvas.addEventListener('click', function(event) {
 
     const rgb = (`rgb(${red}, ${green}, ${blue})`);
 
+    process_data(rgb).then((returnedData) => {
+        console.log('Returned Data', returnedData);
+        // Rest goes here
+        color_name.textContent = returnedData['color_name']
+        color_name.style.color = returnedData['rgb']
+    })
 
-    fetch('/handle_rgb', {
-        method: 'POST',
-        body: JSON.stringify({'rgb': rgb}),
-        headers: {'Content-Type': 'application/json'}
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log('Data received from server:', data);
-        color_name.textContent = data['color']
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
+    /* const data = getData(rgb)
+    color_name.textContent = data['color'] */
 });
+
+async function process_data(rgb) {
+    const data = {'rgb': rgb}
+    try {
+        const response = await fetch('/process-data', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        const result = await response.json();
+        console.log(result);
+
+        return result;
+    } catch(error) {
+        console.log('Error:', error);
+        return null
+    }
+}
