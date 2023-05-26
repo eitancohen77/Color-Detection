@@ -22,19 +22,25 @@ app.get('/', (req, res) => {
 app.post('/process-data', (req, res) => {
     const input = req.body;
     console.log(input)
-    // Here we are telling it to send the json data to transfer.py, 
+    
     const pythonProcess = spawn('python', ['./KNN.py', JSON.stringify({'dataIn': input})]);
+    let errorData = false, outputData = false;
     
     pythonProcess.stdout.on('data', output => {
-      // Send the manipulated data back to the client
         console.log('Python script output:', output);
-        res.json(JSON.parse(output));
+        outputData = JSON.parse(output);
+        if (errorData) {
+            return res.status(500).send('An error occurred while processing the data.');
+        }
+        return res.json(outputData);
     });
 
     pythonProcess.stderr.on('data', error => {
-        // Handle errors
         console.error('Python script error:', error.toString());
-        res.status(500).send('An error occurred while processing the data.');
+        errorData = true;
+        if (outputData) {
+            return res.status(500).send('An error occurred while processing the data.');
+        }
     });
 });
 
